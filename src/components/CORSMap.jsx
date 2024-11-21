@@ -29,6 +29,7 @@ import Extent from '@arcgis/core/geometry/Extent';
 import Print from '@arcgis/core/widgets/Print';
 import Fullscreen from '@arcgis/core/widgets/Fullscreen';
 import Locate from '@arcgis/core/widgets/Locate';
+import LayerList from "@arcgis/core/widgets/LayerList";//cap
 
 const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const mapRef = useRef(null);
@@ -209,10 +210,15 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       container: mapRef.current,
       center: [-95.7129, 37.0902],
       zoom: 3,
-      map: map
+      map: map,
+      //cap
+      constraints:{
+        minZoom: 2,
+        maxZoom: 15,
+      }
     });
-
     viewRef.current = view;  // Store the view in the ref for later use
+
     // Handle uncertainty if enabled
     if (uncertainty_status && outputData) {
       outputData.features.forEach(feature => {
@@ -353,6 +359,20 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       });
 
       view.ui.add(basemapGallery, "top-right");
+
+      //cap
+      // Add LayerList widget
+      const layerList = new Expand({
+        content: new LayerList({
+          view: view,
+          container: document.createElement("div"),
+        }),
+        view: view,
+        expanded: false,
+      });
+      
+      // Add the widget to the MapView UI
+      view.ui.add(layerList, "top-right");
 
       // Measurement widget
       const measurement = new Measurement({
@@ -524,6 +544,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
 
       // Add the Expand widget (with the Print widget inside) to the top-right corner
       view.ui.add(printExpand, "top-right");
+      
       view.on("click", (event) => {
         const lat = event.mapPoint.latitude.toFixed(2);
         const lon = event.mapPoint.longitude.toFixed(2);
@@ -548,6 +569,50 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
               longitude: lon
             });
           });
+      //cap
+      const handleKeyPress=(event)=>{
+        const key=event.key.toLowerCase();
+
+        switch (key){
+          //zoom in and zoom out (-,+)Default
+          case 'b':
+            basemapGallery.expanded = !basemapGallery.expanded;
+            break;
+          case 'f':
+            fullScreen.viewModel.toggle();
+            break;
+          case 'h':
+            homeWidget.go();
+            break;
+          case 'p':
+            printExpand.expanded = !printExpand.expanded;
+            break;
+          case 'c':
+            measurement.clear();
+            polygonGraphicsLayer.removeAll();
+            markerLayer.current.removeAll();
+            break;
+          case 'm':
+            bookmarksExpand.expanded = !bookmarksExpand.expanded;
+            break;
+          case 'Escape':          
+            measurement.clear();
+            view.graphics.removeAll();
+            break;
+          case '1':
+            measurement.activeTool = 'distance';
+            break;
+          case '2':
+            measurement.activeTool = 'area';
+            break;
+        }
+
+      }
+    window.addEventListener('keydown',handleKeyPress);
+    return()=>{
+      if(view)view.destroy();
+      window.removeEventListener('keydown',handleKeyPress);
+    };
       });
     });
   }, [onLocationFound, outputData, fetchedData, loading]);  // Initialize map only once
@@ -598,6 +663,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
 
   // Handle coordinates change (Update marker without reloading the map)
   useEffect(() => {
+    
     if (coordinates && viewRef.current && markerLayer.current) {
       const { lat, lon } = coordinates;
       const point = new Point({
@@ -622,7 +688,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
 
       markerLayer.current.removeAll();  // Clear previous markers
       markerLayer.current.add(marker);  // Add new marker
-
+      
       // Fix: Ensure goTo zooms to the correct location without padding
       viewRef.current.goTo({
         center: point,
@@ -634,6 +700,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
         maxZoom: 15,  // Ensure it doesn't zoom too much
         padding: { top: 0, bottom: 0, left: 0, right: 0 }  // No padding, center exactly on the point
       });
+
     }
   }, [coordinates]);  // Only update when coordinates change
 
@@ -659,14 +726,14 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
         </div>
         <button ref={clearRef} className="esri-widget--button esri-interactive esri-icon-trash" title="Clear Measurements"></button>
       </div>
-      <div ref={mapRef} className="h-[88vh] w-full"></div>  {/* Attach the map view to this div */}
+      <div ref={mapRef} className="h-[88vh] w-full overflow-hidden"></div>  {/* Attach the map view to this div */}
       
       {/* Display the selected features in a table */}
       <div className="selected-features-table p-4">
         <h3 className="text-lg font-semibold mb-4">Selected Features:</h3>
         {selectedFeatures.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="table-auto w-full text-left border-collapse">
+            <table className="table-auto  w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2 border">Site ID</th>
