@@ -30,6 +30,9 @@ import Print from '@arcgis/core/widgets/Print';
 import Fullscreen from '@arcgis/core/widgets/Fullscreen';
 import Locate from '@arcgis/core/widgets/Locate';
 import LayerList from "@arcgis/core/widgets/LayerList";//cap
+import "./MovingPlane.css"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faKeyboard } from "@fortawesome/free-solid-svg-icons";
 
 const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const mapRef = useRef(null);
@@ -49,6 +52,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const [selectedFeatures, setSelectedFeatures] = useState([]);  // State to store selected features
   const [bookmarks, setBookmarks] = useState([]); // State to store bookmarks
   const [bg_loader, setBgLoader] = useState(true);  // Update to bg_loader state
+  const [showBottomBar, setShowBottomBar] = useState(false);
 
   // Fetch data once on component mount if outputData is not provided
   useEffect(() => {
@@ -218,7 +222,6 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       }
     });
     viewRef.current = view;  // Store the view in the ref for later use
-
     // Handle uncertainty if enabled
     if (uncertainty_status && outputData) {
       outputData.features.forEach(feature => {
@@ -598,6 +601,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
           case 'Escape':          
             measurement.clear();
             view.graphics.removeAll();
+            
             break;
           case '1':
             measurement.activeTool = 'distance';
@@ -605,6 +609,16 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
           case '2':
             measurement.activeTool = 'area';
             break;
+          case 'r': // For radius functionality
+            if (radiusDropdownRef.current) {
+              // Toggle the dropdown visibility for radius selection
+              radiusDropdownRef.current.classList.toggle('hidden');
+            }
+            break;
+          case ' ':
+            setShowBottomBar(prev => !prev);
+            break;
+          
         }
 
       }
@@ -651,6 +665,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       }
 
     };
+    
 
     // Attach the click event listener to the map view
   const clickHandle = viewRef.current.on("click", handleClick);
@@ -756,6 +771,23 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
           <p className="text-gray-600">No features selected.</p>
         )}
       </div>
+      {showBottomBar && (
+      <div className="bottom-bar">
+        <p><strong>Keyboard Shortcuts:</strong></p>
+           <div className="shortcuts-grid">
+              <div><span className="key">A</span> Rotate Anti-clockwise</div>
+              <div><span className="key">B</span> Basemap Gallery</div>
+              <div><span className="key">C</span> Clear Measurement</div>
+              <div><span className="key">D</span> Rotate Clockwise</div>
+              <div><span className="key">F</span> Full Screen</div>
+              <div><span className="key">H</span> Home</div>
+              <div><span className="key">M</span> Bookmark</div>
+              <div><span className="key">P</span> Print</div>
+              <div><span className="key">+</span> Zoom In</div>
+              <div><span className="key">-</span> Zoom Out</div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };
