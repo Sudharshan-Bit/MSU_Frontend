@@ -31,6 +31,12 @@ import Fullscreen from '@arcgis/core/widgets/Fullscreen';
 import Locate from '@arcgis/core/widgets/Locate';
 import CoordinateConversion from '@arcgis/core/widgets/CoordinateConversion';
 
+
+//cap
+import "./Style.css"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faKeyboard } from "@fortawesome/free-solid-svg-icons";
+
 const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const mapRef = useRef(null);
   const distanceRef = useRef(null);
@@ -49,6 +55,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const [selectedFeatures, setSelectedFeatures] = useState([]);  // State to store selected features
   const [bookmarks, setBookmarks] = useState([]); // State to store bookmarks
   const [bg_loader, setBgLoader] = useState(true);  // Update to bg_loader state
+  const [showBottomBar, setShowBottomBar] = useState(false);
 
   // Fetch data once on component mount if outputData is not provided
   useEffect(() => {
@@ -563,7 +570,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       //cap
       const handleKeyPress=(event)=>{
         const key=event.key.toLowerCase();
-        if(!(event.altKey)) return; // Ignore if Alt is not pressed
+        if(!(event.shiftKey)) return; // Ignore if Alt is not pressed
         switch (key){
           //zoom in and zoom out (-,+)Default
           case 'm':
@@ -604,9 +611,14 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
               radiusDropdownRef.current.classList.toggle('hidden');
             }
             break;
-          case ' ':
-            setShowBottomBar(prev => !prev);
-            break;          
+          case " ":
+            console.log("sb")
+            // event.preventDefault(); // Prevent default browser scrolling for Space
+            setShowBottomBar((prev) => !prev); // Toggle bottom bar visibility
+            break;
+          default:
+            break;
+               
         }
       }
       window.addEventListener('keydown',handleKeyPress);
@@ -754,6 +766,23 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
           <p className="text-gray-600">No features selected.</p>
         )}
       </div>
+      {showBottomBar && (
+      <div className="bottom-bar">
+        <p><strong>Keyboard Shortcuts:</strong></p>
+           <div className="shortcuts-grid">
+              <div><span className="key">A</span> Rotate Anti-clockwise</div>
+              <div><span className="key">B</span> Basemap Gallery</div>
+              <div><span className="key">C</span> Clear Measurement</div>
+              <div><span className="key">D</span> Rotate Clockwise</div>
+              <div><span className="key">F</span> Full Screen</div>
+              <div><span className="key">H</span> Home</div>
+              <div><span className="key">M</span> Bookmark</div>
+              <div><span className="key">P</span> Print</div>
+              <div><span className="key">+</span> Zoom In</div>
+              <div><span className="key">-</span> Zoom Out</div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

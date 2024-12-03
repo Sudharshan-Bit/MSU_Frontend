@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <ParentFeature /> {/* Use ParentFeature to encapsulate the feature-specific components */}
+        <ParentFeature/> {/* Use ParentFeature to encapsulate the feature-specific components */}
       </div>
     </>
   )
