@@ -561,6 +561,17 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       const ccWidget = new CoordinateConversion({
         view: viewRef.current // Use the MapView reference
       });
+      const infoButton = document.createElement("button");
+      infoButton.innerText = "i";
+      infoButton.className = "info-button"; // Apply the CSS class
+      
+            // Add an event listener for the button
+            infoButton.onclick = () => {
+              setShowBottomBar((prevState) => !prevState);
+            };
+      
+            // Add the button to the view's UI
+            view.ui.add(infoButton, "top-right");
       view.ui.add(ccWidget, "bottom-left");
       const clearFunction = () => {
         if (clearRef.current) {
@@ -574,6 +585,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
         switch (key){
           //zoom in and zoom out (-,+)Default
           case 'm':
+            console.log("asdsa")
             basemapGallery.expanded = !basemapGallery.expanded;
             break;
           case 'f':
@@ -594,27 +606,17 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
           case 'b':
             bookmarksExpand.expanded = !bookmarksExpand.expanded;
             break;
-          case 'Escape':          
-            measurement.clear();
-            view.graphics.removeAll();
-            
-            break;
-          case '1':
+          case '!':
             measurement.activeTool = 'distance';
             break;
-          case '2':
+          case '@':
             measurement.activeTool = 'area';
             break;
-          case 'r': // For radius functionality
+          case '#': // For radius functionality
             if (radiusDropdownRef.current) {
               // Toggle the dropdown visibility for radius selection
               radiusDropdownRef.current.classList.toggle('hidden');
             }
-            break;
-          case " ":
-            console.log("sb")
-            // event.preventDefault(); // Prevent default browser scrolling for Space
-            setShowBottomBar((prev) => !prev); // Toggle bottom bar visibility
             break;
           default:
             break;
