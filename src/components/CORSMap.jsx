@@ -36,6 +36,7 @@ import CoordinateConversion from '@arcgis/core/widgets/CoordinateConversion';
 import "./Style.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKeyboard } from "@fortawesome/free-solid-svg-icons";
+import { FaFacebook, FaTwitter, FaEnvelope } from 'react-icons/fa';
 
 const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const mapRef = useRef(null);
@@ -56,6 +57,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const [bookmarks, setBookmarks] = useState([]); // State to store bookmarks
   const [bg_loader, setBgLoader] = useState(true);  // Update to bg_loader state
   const [showBottomBar, setShowBottomBar] = useState(false);
+  const [isSharePanelVisible, setIsSharePanelVisible] = useState(false);
 
   // Fetch data once on component mount if outputData is not provided
   useEffect(() => {
@@ -617,7 +619,6 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
               // Toggle the dropdown visibility for radius selection
               radiusDropdownRef.current.classList.toggle('hidden');
             }
-            break;
           default:
             break;
                
@@ -715,6 +716,88 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       });
     }
   }, [coordinates]);  // Only update when coordinates change
+   // Copy Link Functionality
+   const copyLink = () => {
+    const link = document.getElementById('share-link');
+    link.select();
+    navigator.clipboard.writeText(link.value);
+    alert('Link copied to clipboard!');
+  };
+
+  // Copy Embed Code Functionality
+  const copyEmbedCode = () => {
+    const embed = document.getElementById('embed-code');
+    embed.select();
+    navigator.clipboard.writeText(embed.value);
+    alert('Embed code copied to clipboard!');
+  };
+
+  // Share Panel content
+  const sharePanelContent = (
+    <div className="p-4 bg-white shadow-lg border border-gray-300 rounded-md">
+      <h3 className="text-xl font-semibold mb-4">Share Map</h3>
+      <p className="mb-2">Link to this map:</p>
+      <textarea
+        id="share-link"
+        readOnly
+        value={window.location.href}
+        className="w-full h-16 mb-4 border border-gray-300 rounded-md"
+      />
+      <button
+        onClick={copyLink}
+        className="w-full py-2 bg-blue-500 text-white rounded-md mb-4"
+      >
+        Copy Link
+      </button>
+
+      <p className="mb-2">Embed this map:</p>
+      <textarea
+        id="embed-code"
+        readOnly
+        value={`<iframe width="600" height="400" frameborder="0" src="${window.location.href}" allowfullscreen></iframe>`}
+        className="w-full h-24 mb-4 border border-gray-300 rounded-md"
+      />
+      <button
+        onClick={copyEmbedCode}
+        className="w-full py-2 bg-blue-500 text-white rounded-md"
+      >
+        Copy Embed Code
+      </button>
+
+      {/* Social media share icons */}
+      <div className="mt-4 flex justify-around">
+        {/* Facebook Icon */}
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600"
+        >
+          <FaFacebook size={30} />
+        </a>
+        
+        {/* Twitter Icon */}
+        <a
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400"
+        >
+          <FaTwitter size={30} />
+        </a>
+        
+        {/* Gmail Icon */}
+        <a
+          href={`https://mail.google.com/mail/?view=cm&fs=1&to=&su=Check%20out%20this%20map&body=${encodeURIComponent(window.location.href)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-red-600"
+        >
+          <FaEnvelope size={30} />
+        </a>
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -785,6 +868,28 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
            </div>
         </div>
       )}
+      {/* Share Button with custom icon */}
+      <button
+          onClick={() => {
+            // Debugging log to check state change
+            console.log('Button clicked! Toggling share panel visibility.');
+            setIsSharePanelVisible(!isSharePanelVisible);
+          }}
+          className="absolute top-[280px] left-6 p-2 bg-white text-white shadow-lg"
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2958/2958791.png"
+            alt="Share Icon"
+            className="w-4 h-4"
+          />
+        </button>
+
+        {/* Display share panel if button is clicked */}
+        {isSharePanelVisible && (
+          <div className="absolute top-[300px] left-16 bg-white shadow-lg border border-gray-300 rounded-md w-80">
+            {sharePanelContent}
+          </div>
+        )}
     </div>
   );
 };
