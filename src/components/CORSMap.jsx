@@ -58,6 +58,10 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
   const [bg_loader, setBgLoader] = useState(true);  // Update to bg_loader state
   const [showBottomBar, setShowBottomBar] = useState(false);
   const [isSharePanelVisible, setIsSharePanelVisible] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false); // To track search focus
+  const searchRef = useRef(null); // Reference to the search input
+  const minimap=useRef(null)
+  const miniMapRef = useRef(null);
 
   // Fetch data once on component mount if outputData is not provided
   useEffect(() => {
@@ -210,6 +214,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
 
     const polygonGraphicsLayer = new GraphicsLayer(); // Layer to hold the drawn rectangle
     markerLayer.current = new GraphicsLayer();  // Graphics layer for markers
+    
     const map = new Map({
       basemap: "gray-vector",
       layers: [geojsonLayer, polygonGraphicsLayer, markerLayer.current]  // Added markerLayer
@@ -221,8 +226,63 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
       zoom: 3,
       map: map
     });
+    const miniMap = new Map({
+      basemap: "gray-vector", // Mini map basemap
+    });
+
+    const miniView = new MapView({
+      container: miniMapRef.current,
+      map: miniMap,
+      center: [-95.7129, 37.0902],
+      zoom: 1,
+      constraints: {
+        snapToZoom: false, // Allow free zoom levels
+      },
+      ui: {
+        components: [], // Remove default UI components for a clean mini-map
+      },
+    });
+
+    // Sync the mini map's basemap with the main map's basemap
+    map.watch("basemap", (newBasemap) => {
+      miniMap.basemap = newBasemap; // Set the mini map's basemap to match the main map's basemap
+    });
+
+    // Flags to track synchronization
+    let isSyncing = false;
+
+    // Sync function with debouncing logic
+    const syncMaps = (sourceView, targetView, scaleFactor) => {
+      if (!isSyncing) {
+        isSyncing = true; // Prevent re-entrant updates
+        targetView
+          .goTo({
+            center: sourceView.extent.center,
+            scale: sourceView.scale * scaleFactor,
+          })
+          .finally(() => {
+            isSyncing = false; // Reset flag after sync
+          });
+      }
+    };
+
+    // Watch for extent changes in the main map
+    view.watch("extent", () => {
+      syncMaps(view, miniView, 3); // Sync mini map to main map
+    });
+
+    // Watch for extent changes in the mini map
+    miniView.watch("extent", () => {
+      syncMaps(miniView, view, 1 / 6); // Sync main map to mini map
+    });
+
+    // Cleanup on component unmount
+
 
     viewRef.current = view;  // Store the view in the ref for later use
+    //cap
+    
+    
     // Handle uncertainty if enabled
     if (uncertainty_status && outputData) {
       outputData.features.forEach(feature => {
@@ -822,6 +882,11 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
         <button ref={clearRef} className="esri-widget--button esri-interactive esri-icon-trash" title="Clear Measurements"></button>
       </div>
       <div ref={mapRef} className="h-[88vh] w-full"></div>  {/* Attach the map view to this div */}
+      <div
+        ref={miniMapRef}
+        className="absolute bottom-36 right-6 h-40 w-40 border-2 border-gray-700 z-10"
+      ></div>
+
       
       {/* Display the selected features in a table */}
       <div className="selected-features-table p-4">
@@ -852,7 +917,7 @@ const CORSMap = ({ onLocationFound, outputData, coordinates }) => {
         )}
       </div>
       {showBottomBar && (
-      <div className="bottom-bar">
+      <div className="bottom-bar hidden md:block">
         <p><strong>Keyboard Shortcuts:</strong></p>
            <div className="shortcuts-grid">
               <div><span className="key">A</span> Rotate Anti-clockwise</div>

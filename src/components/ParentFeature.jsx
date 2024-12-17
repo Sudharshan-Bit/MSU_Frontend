@@ -30,6 +30,7 @@ const ParentFeature = () => {
         <div className="flex-[5] p-2.5 relative h-[60vh] md:h-auto">
           <CORSMap onLocationFound={setLocationInfo} outputData={outputData} coordinates={coordinates} /> {/* Pass outputData to CORSMap */}
         </div>
+        
         {/* Sidebar */}
         <div
           className={`fixed top-0 right-0 h-full bg-gray-200 transition-transform duration-300 ease-in-out shadow-lg z-10 ${
