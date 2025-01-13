@@ -1,0 +1,26 @@
+/* Site Statistics Styles */
+.site-stats h1{
+  text-align: center;
+  margin-top: 20px;
+}
+.site-stats h2{
+  text-align: left;
+  margin-top: 50px;
+}
+.site-stats {
+  text-align: left;
+  margin-top: 20px;
+}
+
+
+.react-datepicker__navigation {
+  top: 0.5rem; /* Adjust to move the arrow down */
+}
+
+.react-datepicker__navigation--previous {
+  left: 0.75rem; /* Adjust the left position if needed */
+}
+
+.react-datepicker__navigation--next {
+  right: 0.75rem; /* Adjust the right position if needed */
+}

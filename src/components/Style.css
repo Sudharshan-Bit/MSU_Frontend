@@ -1,0 +1,93 @@
+.map-div {
+    flex: 1;
+  }
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 350px;
+    width: 100%;
+    background-color: #333; /* Dark background for the bar */
+    color: white; /* Light text for contrast */
+    padding: 15px 20px; /* Spacing around the content */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow at the top */
+    z-index: 1000; /* Ensure it stays above other elements */
+    text-align: center; /* Center-align the content */
+  }
+  
+  /* Grid layout for the shortcuts */
+  .shortcuts-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+    gap: 10px; /* Space between grid items */
+    text-align: left; /* Align text to the left */
+    margin-top: 10px; /* Space above the grid */
+  }
+  
+  /* Shortcut item container */
+  .shortcuts-grid div {
+    display: flex; /* Align items in a row */
+    align-items: center; /* Center key and text vertically */
+    gap: 10px; /* Space between the key and its label */
+    font-size: 16px; /* Text size for readability */
+  }
+  
+  /* Style for key buttons */
+  .key {
+    display: inline-block; /* Inline block to adjust size */
+    background-color: #444; /* Dark gray background */
+    color: #fff; /* White text color */
+    padding: 5px 10px; /* Padding inside the key */
+    border-radius: 4px; /* Slightly rounded corners */
+    border: 1px solid #666; /* Subtle border */
+    font-family: "Roboto", sans-serif; /* Clean, modern font */
+    font-size: 14px; /* Text size inside the key */
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+  }
+  
+  /* Hover effects for key buttons */
+  .key:hover {
+    background-color: #555; /* Lighter gray on hover */
+    color: #4fd1c5; /* Cyan text color on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Deeper shadow on hover */
+    cursor: pointer; /* Pointer cursor for interactivity */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .shortcuts-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Smaller columns for smaller screens */
+    }
+  
+    .key {
+      font-size: 12px; /* Adjust key size for smaller screens */
+      padding: 4px 8px; /* Smaller padding */
+    }
+  
+    .shortcuts-grid div {
+      font-size: 14px; /* Adjust text size */
+    }
+  }
+
+
+  .info-button {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #007ac2;
+    color: white;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    font-style: italic;
+    font-weight: bold;
+  }
+  .info-button:hover{
+scale: .7;
+  }
